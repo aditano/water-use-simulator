@@ -202,10 +202,11 @@ button, a { font: inherit; }
   position: absolute;
   inset: 0 0 42% 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.45), transparent 36%),
-    repeating-linear-gradient(90deg, transparent 0 42px, rgba(120, 90, 50, 0.16) 42px 44px),
-    linear-gradient(180deg, #f8f3ea, #e4d9c6);
-  box-shadow: inset 0 -12px 16px rgba(80, 55, 25, 0.08);
+    radial-gradient(540px 260px at 8% -8%, rgba(255, 255, 255, 0.72), transparent 58%),
+    linear-gradient(128deg, rgba(255, 255, 255, 0.2) 0%, transparent 42%, rgba(70, 48, 28, 0.1) 100%),
+    repeating-linear-gradient(90deg, transparent 0 42px, rgba(110, 82, 48, 0.13) 42px 43px),
+    linear-gradient(180deg, #f3eee6, #e0d4c2);
+  box-shadow: inset 0 -14px 18px rgba(70, 48, 24, 0.1);
 }
 
 .backsplash::after {
@@ -235,19 +236,18 @@ button, a { font: inherit; }
   position: relative;
   z-index: 5;
   overflow: visible;
-  filter: drop-shadow(0 10px 6px rgba(40, 28, 16, 0.28));
   pointer-events: none;
 }
 
 .handle {
-  transform-box: fill-box;
-  transform-origin: 18% 50%;
+  transform-box: view-box;
+  transform-origin: 78px 34px;
   transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .bench[data-state="filling"] .handle,
 .bench[data-state="pouring"] .handle {
-  transform: rotate(-34deg);
+  transform: rotate(-26deg);
 }
 
 .aerator {
@@ -268,27 +268,33 @@ button, a { font: inherit; }
 }
 
 .stream {
-  height: 42px;
-  border-radius: 8px;
+  height: 48px;
+  width: 12px;
+  margin-left: 1px;
+  border-radius: 7px;
   opacity: 0;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 46%, rgba(255, 255, 255, 0) 72%),
-    linear-gradient(#f7fcff, #8fd4f4 18%, #2f8ed4 70%, #1668aa);
-  box-shadow: 0 0 10px rgba(70, 170, 230, 0.55);
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0) 0 5px, rgba(255, 255, 255, 0.55) 7px, rgba(255, 255, 255, 0) 12px),
+    linear-gradient(90deg, rgba(8, 36, 64, 0.2) 0%, rgba(255, 255, 255, 0.2) 22%, #ffffff 38%, rgba(210, 236, 255, 0.15) 50%, rgba(255, 255, 255, 0.28) 68%, rgba(6, 32, 58, 0.28) 100%),
+    linear-gradient(#f4fbff, #6eb8e6 16%, #1e74bc 72%, #124e86);
+  background-size: 100% 16px, 100% 100%, 100% 100%;
+  box-shadow:
+    1px 0 0 rgba(255, 255, 255, 0.65) inset,
+    -1px 0 0 rgba(8, 30, 50, 0.25) inset,
+    0 0 10px rgba(70, 160, 220, 0.4);
   transform-origin: top center;
   transform: scaleY(0.2);
 }
 
 .stream.on {
-  opacity: 0.95;
+  opacity: 0.96;
   transform: scaleY(1);
   transition: transform 0.28s ease, opacity 0.18s linear;
-  animation: stream-sheen 0.7s linear infinite;
+  animation: stream-sheen 0.42s linear infinite;
 }
 
 @keyframes stream-sheen {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 0 42px, 0 42px; }
+  to { background-position: 0 16px, 0 0, 0 0; }
 }
 
 .drop {
@@ -397,6 +403,29 @@ button, a { font: inherit; }
     linear-gradient(180deg, #c5efff 0%, #3e9ad8 28%, #0c4c84 100%);
 }
 
+.water::before {
+  content: "";
+  position: absolute;
+  left: 30%;
+  top: 0;
+  bottom: 0;
+  width: 16%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
+  pointer-events: none;
+}
+
+.bench[data-state="filling"] .water::before {
+  left: 36%;
+  width: 14%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.82), transparent);
+}
+
+.bench[data-state="filling"] .glass-shine {
+  background:
+    linear-gradient(108deg, rgba(255, 255, 255, 0.78), transparent 16% 68%, rgba(255, 255, 255, 0.3)),
+    linear-gradient(90deg, transparent 40%, rgba(255, 255, 255, 0.5) 49%, transparent 58%);
+}
+
 .meniscus {
   position: absolute;
   left: -8%;
@@ -481,6 +510,18 @@ button, a { font: inherit; }
     inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
+.foot::after {
+  content: "";
+  position: absolute;
+  left: -6px;
+  right: -10px;
+  bottom: -8px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 42% 50%, rgba(36, 24, 12, 0.42), transparent 70%);
+  z-index: -1;
+}
+
 .spill {
   position: absolute;
   left: 158px;
@@ -524,11 +565,13 @@ button, a { font: inherit; }
   height: 78px;
   border-radius: 0 0 120px 120px / 0 0 46px 46px;
   background:
-    radial-gradient(70% 46% at 50% 0%, rgba(255, 255, 255, 0.9), transparent 58%),
-    linear-gradient(180deg, #fbf9f6, #e3dbcd 62%, #cfc6b6);
+    radial-gradient(80% 70% at 18% 0%, rgba(255, 255, 255, 0.92), transparent 52%),
+    radial-gradient(55% 90% at 82% 110%, rgba(70, 48, 28, 0.16), transparent 62%),
+    linear-gradient(180deg, #fbf9f6, #e0d6c6 68%, #c8bdae);
   box-shadow:
-    inset 0 16px 18px rgba(90, 68, 36, 0.16),
-    inset 0 -6px 10px rgba(255, 255, 255, 0.65),
+    inset 10px 12px 16px rgba(255, 255, 255, 0.45),
+    inset -16px 18px 20px rgba(70, 48, 26, 0.16),
+    inset 0 16px 16px rgba(80, 58, 30, 0.12),
     0 8px 12px rgba(60, 40, 20, 0.12);
 }
 
@@ -558,9 +601,23 @@ button, a { font: inherit; }
   margin-left: -26px;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 46%, #24282e 0 26%, #aeb6bf 30% 40%, #f4f6f8 43% 50%, #667078 54% 66%, #1a1e24 70%);
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    radial-gradient(circle at 38% 40%, #f2f4f6 0 8%, #8e979f 18%, #24282e 28% 46%, #c5ccd2 48% 58%, #4e565e 62% 74%, #161a1e 78%);
+  box-shadow:
+    0 7px 8px rgba(30, 22, 12, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
   z-index: 2;
+}
+
+.drain::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  right: -10px;
+  top: -4px;
+  bottom: -7px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 45% 40%, rgba(28, 20, 12, 0.38), transparent 70%);
+  z-index: -1;
 }
 
 .grate {
