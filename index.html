@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Water Glass — AI water-use simulator</title>
+    <meta
+      name="description"
+      content="A skeuomorphic simulator of cited AI query and data-center water figures. The glass fills from published numbers."
+    />
+    <link rel="icon" href="%BASE_URL%favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <div class="desk">
+      <div class="device">
+        <header class="nav">
+          <div>
+            <p class="nav-kicker">Utilities</p>
+            <h1>Water Glass</h1>
+          </div>
+          <button type="button" class="nav-btn" id="open-sources">Sources</button>
+        </header>
+        <div class="segmented" role="tablist" aria-label="What to pour">
+          <button type="button" id="tab-datacenter" role="tab" aria-selected="false">Data Centers</button>
+          <button type="button" id="tab-model" role="tab" aria-selected="true">AI Models</button>
+        </div>
+        <div class="workspace">
+          <section class="stage" aria-label="Sink">
+            <div class="bench" id="scene" data-state="idle" data-menu="model" data-level="0">
+              <div class="faucet" aria-hidden="true">
+                <div class="faucet-neck"></div>
+                <div class="faucet-spout">
+                  <div class="faucet-lip"></div>
+                </div>
+                <div class="stream" id="stream" hidden></div>
+                <div class="drops" id="drops"></div>
+              </div>
+              <div class="cup-rig">
+                <div class="cup" id="cup">
+                  <ol class="ticks" id="ticks"></ol>
+                  <div class="glass">
+                    <div class="water" id="water"><span class="meniscus"></span></div>
+                    <div class="glass-shine"></div>
+                  </div>
+                  <div class="spill" id="spill" hidden></div>
+                </div>
+              </div>
+              <div class="sink" aria-hidden="true">
+                <div class="basin"></div>
+                <div class="drain"><span></span></div>
+              </div>
+            </div>
+            <div class="plaque" id="plaque" aria-live="polite"></div>
+            <p class="legend" id="legend"></p>
+          </section>
+          <section class="picker-wrap" aria-label="Choose a figure">
+            <div class="picker" id="picker" role="listbox"></div>
+          </section>
+        </div>
+        <div class="chin" aria-hidden="true"><span class="home"></span></div>
+      </div>
+    </div>
+    <dialog id="sources">
+      <div class="sheet">
+        <header class="sheet-bar">
+          <h2>Sources</h2>
+          <button type="button" class="nav-btn" id="close-sources">Done</button>
+        </header>
+        <div id="sources-body" class="sheet-body"></div>
+      </div>
+    </dialog>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
