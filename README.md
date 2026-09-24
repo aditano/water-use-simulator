@@ -2,11 +2,9 @@
 
 A static, skeuomorphic water-use simulator. Pick a data center or an AI model and a glass under a chrome faucet fills from a cited number. Switching selections pours the glass into the drain, rights it, and refills it to the new level.
 
-The live site is intended for GitHub Pages:
+The site is published at **https://aditano.github.io/water-use-simulator/**
 
-**https://aditano.github.io/water-use-simulator/**
-
-Pages deploys from `main` with [`.github/workflows/pages.yml`](.github/workflows/pages.yml). In the repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. The first successful run on `main` publishes the site.
+Pushes to `main` run [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which builds the app and deploys it with GitHub Actions. Pages uses that workflow as its source. If a future settings change points Pages back at the raw `main` branch, switch **Settings → Pages → Source** to **GitHub Actions** so the built files are what get served.
 
 ## Run locally
 
