@@ -7,8 +7,8 @@ export interface PlayRequest {
   overflow: boolean;
 }
 
-const POUR_MS = 720;
-const RETURN_MS = 560;
+const POUR_MS = 880;
+const RETURN_MS = 620;
 const DROP_MS = 540;
 const DROP_GAP_MS = 120;
 
@@ -154,26 +154,53 @@ export class WaterScene {
   private async pourOut(): Promise<void> {
     this.root.dataset.state = "pouring";
     this.spill.hidden = false;
+    const ease = "cubic-bezier(.42,.04,.22,1)";
     const tilt = this.cup.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(62deg)" }],
-      { duration: POUR_MS, easing: "cubic-bezier(.45,.04,.2,1)", fill: "forwards" },
+      [
+        { transform: "rotate(0deg)" },
+        { transform: "rotate(24deg)", offset: 0.36 },
+        { transform: "rotate(56deg)" },
+      ],
+      { duration: POUR_MS, easing: ease, fill: "forwards" },
+    );
+    const sheet = this.spill.animate(
+      [
+        { transform: "rotate(0deg) scaleY(0.08)", opacity: 0 },
+        { transform: "rotate(-24deg) scaleY(0.2)", opacity: 0.15, offset: 0.36 },
+        { transform: "rotate(-46deg) scaleY(1)", opacity: 1, offset: 0.74 },
+        { transform: "rotate(-56deg) scaleY(0.12)", opacity: 0 },
+      ],
+      { duration: POUR_MS, easing: ease, fill: "forwards" },
     );
     const drain = this.water.animate(
-      [{ height: `${this.fraction * 100}%` }, { height: "0%" }],
-      { duration: POUR_MS - 80, delay: 90, easing: "cubic-bezier(.3,.1,.3,1)", fill: "forwards" },
+      [
+        { height: `${this.fraction * 100}%`, transform: "rotate(0deg)" },
+        { height: `${Math.max(20, this.fraction * 88)}%`, transform: "rotate(-6deg)", offset: 0.36 },
+        { height: "6%", transform: "rotate(-20deg)", offset: 0.74 },
+        { height: "0%", transform: "rotate(-28deg)" },
+      ],
+      { duration: POUR_MS, easing: ease, fill: "forwards" },
     );
-    await Promise.all([tilt.finished, drain.finished]);
+    await Promise.all([tilt.finished, drain.finished, sheet.finished]);
     this.fraction = 0;
     this.applyLevel();
+    this.spill.hidden = true;
+    for (const animation of this.spill.getAnimations()) {
+      animation.cancel();
+    }
     await this.cup.animate(
-      [{ transform: "rotate(62deg)" }, { transform: "rotate(0deg)" }],
-      { duration: RETURN_MS, easing: "cubic-bezier(.16,.8,.24,1)", fill: "forwards" },
+      [
+        { transform: "rotate(56deg)" },
+        { transform: "rotate(-6deg)", offset: 0.72 },
+        { transform: "rotate(2deg)", offset: 0.88 },
+        { transform: "rotate(0deg)" },
+      ],
+      { duration: RETURN_MS + 80, easing: "cubic-bezier(.16,.8,.24,1)", fill: "forwards" },
     ).finished;
     for (const animation of this.cup.getAnimations()) {
       animation.cancel();
     }
     this.cup.style.transform = "rotate(0deg)";
-    this.spill.hidden = true;
   }
 
   private async fillByDrops(next: PlayRequest, generation: number): Promise<void> {
@@ -189,6 +216,7 @@ export class WaterScene {
       if (this.stale(generation)) {
         return;
       }
+      this.splash();
       this.fraction = Math.min(next.fraction, this.fraction + step);
       this.water.animate(
         [
@@ -205,21 +233,48 @@ export class WaterScene {
     this.applyLevel();
   }
 
+  private fallDistance(): number {
+    const from = this.drops.getBoundingClientRect();
+    const glass = this.cup.querySelector(".glass");
+    if (!glass) {
+      return 150;
+    }
+    const mouth = glass.getBoundingClientRect();
+    const surface = mouth.bottom - 8 - this.fraction * (mouth.height - 16);
+    return Math.max(36, surface - from.top);
+  }
+
   private spawnDrop(tiny: boolean): Promise<void> {
     const drop = document.createElement("span");
     drop.className = tiny ? "drop tiny" : "drop";
     this.drops.append(drop);
     const scale = tiny ? 0.62 : 1;
+    const distance = this.fallDistance();
     const fall = drop.animate(
       [
-        { transform: `translateY(0) scale(${scale})`, opacity: 0 },
-        { transform: `translateY(16px) scale(${scale})`, opacity: 1, offset: 0.14 },
-        { transform: `translateY(168px) scale(${scale * 0.9})`, opacity: 1 },
+        { transform: `translateY(0) scale(${scale}, ${scale * 0.8})`, opacity: 0 },
+        { transform: `translateY(10px) scale(${scale * 0.86}, ${scale * 1.15})`, opacity: 1, offset: 0.16 },
+        { transform: `translateY(${distance}px) scale(${scale * 0.92}, ${scale * 1.22})`, opacity: 1 },
       ],
-      { duration: DROP_MS, easing: "cubic-bezier(.35,.05,.75,1)", fill: "forwards" },
+      { duration: DROP_MS, easing: "cubic-bezier(.42,.02,.72,1)", fill: "forwards" },
     );
     return fall.finished.then(() => {
       drop.remove();
+    });
+  }
+
+  private splash(): void {
+    const ring = document.createElement("span");
+    ring.className = "impact";
+    this.water.append(ring);
+    void ring.animate(
+      [
+        { transform: "translateX(-50%) scale(0.2)", opacity: 0.85 },
+        { transform: "translateX(-50%) scale(1.8)", opacity: 0 },
+      ],
+      { duration: 420, easing: "ease-out", fill: "forwards" },
+    ).finished.then(() => {
+      ring.remove();
     });
   }
 
