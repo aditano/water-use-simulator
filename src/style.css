@@ -356,7 +356,7 @@ dialog::backdrop {
 @media (max-width: 900px) {
   .brand { padding: 8px 12px; }
   .brand h1 { font-size: 22px; }
-  .tabs { top: 74px; }
+  .tabs { top: 88px; }
   .side {
     top: auto;
     left: 0;

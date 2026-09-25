@@ -96,6 +96,8 @@ export class WaterScene {
   private mobile = false;
   private framed = false;
   private rendered = false;
+  private loopRunning = false;
+  private stillFrames = 0;
   private readonly tmpA = new THREE.Vector3();
   private readonly tmpB = new THREE.Vector3();
   private readonly tmpDir = new THREE.Vector3();
@@ -113,13 +115,35 @@ export class WaterScene {
     this.renderer = renderer;
     this.build(renderer);
     this.showMarks("model", options.modelCapacity);
-    renderer.setAnimationLoop(this.frame);
+    this.controls?.addEventListener("start", this.onControlStart);
+    this.controls?.addEventListener("end", this.onControlEnd);
+    this.controls?.addEventListener("change", this.ensureLoop);
+    this.ensureLoop();
   }
+
+  private onControlStart = (): void => {
+    this.stillFrames = 0;
+    this.ensureLoop();
+  };
+
+  private onControlEnd = (): void => {
+    this.ensureLoop();
+  };
+
+  private ensureLoop = (): void => {
+    if (this.loopRunning || !this.renderer) {
+      return;
+    }
+    this.loopRunning = true;
+    this.stillFrames = 0;
+    this.renderer.setAnimationLoop(this.frame);
+  };
 
   request(next: PlayRequest): void {
     if (!this.ok) {
       return;
     }
+    this.ensureLoop();
     if (this.reducedMotion()) {
       this.pending = null;
       this.applyInstant(next);
@@ -139,9 +163,10 @@ export class WaterScene {
   private createRenderer(): THREE.WebGLRenderer | null {
     try {
       const renderer = new THREE.WebGLRenderer({
-        antialias: true,
+        antialias: false,
         alpha: false,
         powerPreference: "high-performance",
+        preserveDrawingBuffer: true,
       });
       if (!renderer.getContext()) {
         renderer.dispose();
@@ -150,10 +175,10 @@ export class WaterScene {
       }
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.12;
+      renderer.toneMappingExposure = 0.72;
       renderer.setClearColor(0x090b10, 1);
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.shadowMap.enabled = false;
+      renderer.transmissionResolutionScale = 0.5;
       renderer.localClippingEnabled = true;
       return renderer;
     } catch {
@@ -171,7 +196,7 @@ export class WaterScene {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x090b10);
     scene.environment = studioEnvironment(renderer);
-    scene.environmentIntensity = 0.92;
+    scene.environmentIntensity = 0.58;
     this.scene = scene;
 
     const camera = new THREE.PerspectiveCamera(28, 1, 0.04, 40);
@@ -203,21 +228,17 @@ export class WaterScene {
   }
 
   private addLights(scene: THREE.Scene): void {
-    scene.add(new THREE.HemisphereLight(0xc5d4e6, 0x2a241c, 0.42));
-    const key = new THREE.SpotLight(0xfff3e4, 90, 5.5, 0.48, 0.78, 1.2);
-    key.position.set(1.15, 1.85, 0.95);
-    key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
-    key.shadow.bias = -0.00018;
-    key.shadow.normalBias = 0.025;
-    key.target.position.set(0, 0.12, -0.02);
+    scene.add(new THREE.HemisphereLight(0xb7c6d8, 0x1a1814, 0.28));
+    const key = new THREE.SpotLight(0xfff3e4, 38, 4.2, 0.55, 0.72, 1.4);
+    key.position.set(0.85, 1.55, 0.72);
+    key.target.position.set(0, 0.16, -0.02);
     scene.add(key, key.target);
 
-    const fill = new THREE.DirectionalLight(0xd5e4ff, 0.85);
+    const fill = new THREE.DirectionalLight(0xc5d4ea, 0.38);
     fill.position.set(-0.9, 0.7, 1.15);
     scene.add(fill);
 
-    const rim = new THREE.SpotLight(0xd7ecff, 36, 4.2, 0.7, 0.9, 1);
+    const rim = new THREE.SpotLight(0xd7ecff, 18, 3.4, 0.62, 0.85, 1);
     rim.position.set(-1.15, 1.25, -0.85);
     rim.target.position.set(0, 0.14, 0);
     scene.add(rim, rim.target);
@@ -252,24 +273,32 @@ export class WaterScene {
     scene.add(product);
 
     const porcelain = new THREE.MeshPhysicalMaterial({
-      color: 0xf4f1ea,
-      roughness: 0.38,
+      color: 0xcfc6b8,
+      roughness: 0.48,
       metalness: 0.02,
-      clearcoat: 0.45,
-      clearcoatRoughness: 0.38,
+      clearcoat: 0.28,
+      clearcoatRoughness: 0.46,
     });
-    const bowl = new THREE.Mesh(new THREE.LatheGeometry(bowlProfile(), 72), porcelain);
+    const bowl = new THREE.Mesh(new THREE.LatheGeometry(bowlProfile(), 48), porcelain);
     bowl.castShadow = true;
     bowl.receiveShadow = true;
     product.add(bowl);
 
+    const well = new THREE.Mesh(
+      new THREE.CircleGeometry(0.15, 48),
+      new THREE.MeshStandardMaterial({ color: 0x6e6860, roughness: 0.78, metalness: 0.04 }),
+    );
+    well.rotation.x = -Math.PI / 2;
+    well.position.y = 0.0476;
+    product.add(well);
+
     const chrome = new THREE.MeshPhysicalMaterial({
-      color: 0xf4f5f7,
+      color: 0xd5dbe2,
       metalness: 1,
-      roughness: 0.16,
-      clearcoat: 0.25,
-      clearcoatRoughness: 0.2,
-      envMapIntensity: 1.4,
+      roughness: 0.22,
+      clearcoat: 0.2,
+      clearcoatRoughness: 0.28,
+      envMapIntensity: 1.15,
     });
     product.add(this.buildFaucet(chrome));
     product.add(this.buildDrain(chrome));
@@ -280,34 +309,34 @@ export class WaterScene {
     this.glass = glass;
 
     const glassMat = new THREE.MeshPhysicalMaterial({
-      color: 0xf7fbff,
+      color: 0xe7f2f6,
       metalness: 0,
-      roughness: 0.035,
-      transmission: 1,
-      thickness: 0.06,
+      roughness: 0.06,
+      transmission: 0.92,
+      thickness: 0.42,
       ior: 1.5,
       clearcoat: 1,
-      clearcoatRoughness: 0.06,
-      attenuationColor: new THREE.Color("#e5f3ee"),
-      attenuationDistance: 0.4,
-      envMapIntensity: 1,
+      clearcoatRoughness: 0.08,
+      attenuationColor: new THREE.Color("#b7d4cc"),
+      attenuationDistance: 0.16,
+      envMapIntensity: 1.05,
       transparent: true,
     });
-    const shell = new THREE.Mesh(new THREE.LatheGeometry(glassProfile(), 72), glassMat);
+    const shell = new THREE.Mesh(new THREE.LatheGeometry(glassProfile(), 48), glassMat);
     shell.renderOrder = 1;
     glass.add(shell);
 
     const waterMat = new THREE.MeshPhysicalMaterial({
-      color: 0x1f78d2,
+      color: 0x1a6ec4,
       metalness: 0,
-      roughness: 0.05,
-      transmission: 0.42,
-      thickness: 0.18,
+      roughness: 0.08,
+      transmission: 0.22,
+      thickness: 0.2,
       ior: 1.333,
       attenuationColor: new THREE.Color("#083e86"),
-      attenuationDistance: 0.055,
+      attenuationDistance: 0.04,
       transparent: true,
-      envMapIntensity: 0.8,
+      envMapIntensity: 0.55,
     });
     waterMat.polygonOffset = true;
     waterMat.polygonOffsetFactor = -2;
@@ -321,11 +350,11 @@ export class WaterScene {
     const meniscus = new THREE.Mesh(
       new THREE.CircleGeometry(1, 56),
       new THREE.MeshStandardMaterial({
-        color: 0xd7efff,
-        roughness: 0.08,
-        metalness: 0.14,
+        color: 0x3d92d8,
+        roughness: 0.12,
+        metalness: 0.08,
         transparent: true,
-        opacity: 0.94,
+        opacity: 0.92,
       }),
     );
     meniscus.rotation.x = -Math.PI / 2;
@@ -385,9 +414,9 @@ export class WaterScene {
     product.add(puddle);
     this.puddle = puddle;
 
-    const footShadow = softDisc(0.5);
+    const footShadow = softDisc(0.72);
     footShadow.position.set(0, 0.0482, -0.02);
-    footShadow.scale.set(0.055, 0.05, 1);
+    footShadow.scale.set(0.085, 0.07, 1);
     product.add(footShadow);
   }
 
@@ -401,7 +430,7 @@ export class WaterScene {
       new THREE.Vector3(0, 0.255, -0.02),
     ];
     const curve = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.45);
-    const neck = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, 0.011, 24, false), chrome);
+    const neck = new THREE.Mesh(new THREE.TubeGeometry(curve, 48, 0.011, 16, false), chrome);
     neck.castShadow = true;
     faucet.add(neck);
 
@@ -505,7 +534,9 @@ export class WaterScene {
     if (!this.scene || !this.camera || !this.renderer || !this.controls) {
       return;
     }
-    const dt = this.lastTime === 0 ? 0.016 : Math.min(0.05, (time - this.lastTime) / 1000);
+    const rawMs = this.lastTime === 0 ? 16 : time - this.lastTime;
+    this.root.dataset.dt = String(Math.round(rawMs));
+    const dt = Math.min(0.05, rawMs / 1000);
     this.lastTime = time;
     this.scene.updateMatrixWorld(true);
     this.updatePhase(time);
@@ -522,7 +553,36 @@ export class WaterScene {
       this.rendered = true;
       this.root.dataset.ready = "true";
     }
+    this.settleLoop();
   };
+
+  private settleLoop(): void {
+    if (!this.renderer || !this.camera || !this.controls) {
+      return;
+    }
+    const droplets = this.drops.some((drop) => drop.alive);
+    let why = "ok";
+    if (this.phase.name !== "idle") {
+      why = this.phase.name;
+    } else if (droplets) {
+      why = "drops";
+    } else if (Math.abs(this.level - this.levelTarget) > 0.001) {
+      why = "level";
+    } else if (Math.abs(this.puddleOpacity - this.puddleTarget) > 0.02) {
+      why = "puddle";
+    }
+    this.root.dataset.why = why;
+    const busy = why !== "ok";
+    if (busy) {
+      this.stillFrames = 0;
+      return;
+    }
+    this.stillFrames += 1;
+    if (this.stillFrames > 2) {
+      this.renderer.setAnimationLoop(null);
+      this.loopRunning = false;
+    }
+  }
 
   private updatePhase(time: number): void {
     const phase = this.phase;
@@ -1002,6 +1062,8 @@ export class WaterScene {
   }
 
   private syncDom(): void {
+    this.root.dataset.loop = this.loopRunning ? "yes" : "no";
+    this.root.dataset.still = String(this.stillFrames);
     this.root.dataset.state = stateName(this.phase);
     this.root.dataset.level = this.level.toFixed(4);
     this.root.dataset.overflow = this.phase.name === "spill" || this.settledOverflow ? "true" : "false";
@@ -1037,7 +1099,7 @@ function glassProfile(): THREE.Vector2[] {
   const y1 = y0 + TUMBLER.innerHeight;
   const r0 = TUMBLER.bottomRadius;
   const r1 = TUMBLER.topRadius;
-  const wall = 0.0052;
+  const wall = 0.0064;
   const pts: THREE.Vector2[] = [];
   const push = (x: number, y: number) => {
     pts.push(new THREE.Vector2(x, y));
@@ -1052,8 +1114,8 @@ function glassProfile(): THREE.Vector2[] {
     const y = y0 + (y1 - y0) * t;
     push(r0 + (r1 - r0) * t + wall, y);
   }
-  push(r1 + wall + 0.0025, y1 + 0.0035);
-  push(r1 + 0.0085, y1 + 0.0075);
+  push(r1 + wall + 0.003, y1 + 0.004);
+  push(r1 + 0.011, y1 + 0.0085);
   push(r1 + 0.0015, y1 + 0.0075);
   push(r1, y1);
   for (let i = steps; i >= 0; i -= 1) {
@@ -1119,12 +1181,12 @@ function tileTexture(): THREE.CanvasTexture {
   if (!ctx) {
     throw new Error("Could not draw the tile floor.");
   }
-  ctx.fillStyle = "#b7afa2";
+  ctx.fillStyle = "#6d675e";
   ctx.fillRect(0, 0, size, size);
   const tiles = 4;
-  const gap = 7;
+  const gap = 8;
   const cell = size / tiles;
-  const colors = ["#e7dfd2", "#f3ece2", "#e2d9cc", "#efe6da"];
+  const colors = ["#c9c0b2", "#d5cdc0", "#bfb6a8", "#cec5b8"];
   for (let y = 0; y < tiles; y += 1) {
     for (let x = 0; x < tiles; x += 1) {
       ctx.fillStyle = colors[(x + y * 2) % colors.length];
@@ -1220,7 +1282,7 @@ function studioEnvironment(renderer: THREE.WebGLRenderer): THREE.Texture {
   };
   addPlane(0xfff4e4, 3.4, 1.8, 1.7, 1.9, 1.5, focus);
   addPlane(0xc5dcff, 1.2, 2.3, -1.7, 1.15, 0.5, focus);
-  addPlane(0xe4ddd0, 4.5, 4.5, 0, -0.15, 0.1, new THREE.Vector3(0, 1, 0));
+  addPlane(0x4a463f, 4.5, 4.5, 0, -0.15, 0.1, new THREE.Vector3(0, 1, 0));
   addPlane(0x9fb6cc, 2.6, 0.45, 0.1, 2.3, -1.3, focus);
   const pmrem = new THREE.PMREMGenerator(renderer);
   const target = pmrem.fromScene(env, 0.04);
