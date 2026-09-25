@@ -1,6 +1,6 @@
 # Water Glass
 
-A static, skeuomorphic water-use simulator. Pick a data center or an AI model and a glass under a chrome faucet fills from a cited number. Switching selections pours the glass into the drain, rights it, and refills it to the new level.
+A static water-use simulator. Pick a data center or an AI model and a 3D glass under a chrome faucet fills from a cited number. Switching selections pours the glass into the basin, rights it, and refills it to the new level.
 
 The site is published at **https://aditano.github.io/water-use-simulator/**
 
@@ -20,11 +20,13 @@ Open `http://localhost:5173/water-use-simulator/`. The Vite `base` is `/water-us
 
 ## How the glass works
 
-Two menus, two etchings. The etching is printed on the glass and restated under it.
+The sink is a [Three.js](https://threejs.org/) studio (WebGL), bundled by Vite: a dark room, a grouted tile floor, a porcelain basin, a chrome gooseneck, and a thick transmission-glass tumbler. Drag the stage to orbit. The lists, tabs, and plaque are a thin glass HUD over that scene. Cited numbers stay on the plaque — the picture does not replace them.
 
-**AI Models.** The glass holds **20 mL**. One falling drop is one short **GPT-4o** query on the derived scale below (**1.44 mL**). A short **Claude 3.7 Sonnet** query is about twice that, so the faucet lets two drops fall. Amounts past 20 mL fill the glass and spill into the drain — that is how a 519 mL email estimate and a 166 mL DeepSeek-R1 estimate stay on the same object without pretending they are one drop.
+Two menus, two etchings. The etching is on the glass and restated on the plaque.
 
-**Data Centers.** The glass holds **4 million gallons per day**. Fill is that campus or fleet’s cited daily figure divided by 4 million. These are not queries. The badge on the plaque says whether the number is consumption, withdrawal, a utility meter, a contract peak, or a requested cap.
+**AI Models.** The tumbler is etched at **40 mL**. Height is the real volume of this taper, so the marks sit closer together near the rim and a few milliliters stay low in the glass. One falling drop is one short **GPT-4o** query (**1.44 mL**), a shallow pool at the foot — the drop reference. A short **Claude 3.7 Sonnet** query is about twice that, so the faucet lets two drops fall. Short prompts from under a milliliter through about 25 mL (Llama 3.3 up through o3) fill part of the glass, and you can watch the pour: drops for a tiny amount, then a stream. Three rows sit past the etching and spill on purpose — Mistral Large 2 at 45 mL, DeepSeek-R1 at 166 mL, and the 519 mL GPT-4 email. The plaque says **Exceeds glass**. The spill plays after the tumbler is full. It is not the resting state of a typical row.
+
+**Data Centers.** The same tumbler is re-etched at **4 million gallons per day**. Fill is that campus or fleet’s cited daily figure divided by 4 million. These are not queries, and they are not drawn on the 40 mL scale. The badge on the plaque says whether the number is consumption, withdrawal, a utility meter, a contract peak, or a requested cap.
 
 There is no backend. The glass never invents a number for a missing model. **Grok** has no published per-query water figure in the sources below, so choosing it pours the glass out and leaves it empty. Campus water for Colossus and Colossus 2 is on the other menu.
 

@@ -1,5 +1,5 @@
 import catalog from "../data/figures.json";
-import { dropUnits, evidenceLabel, fillFraction, formatAmount, formatRange, legendFor } from "./format";
+import { dropUnits, evidenceLabel, fillFraction, formatAmount, formatRange, legendFor, scaleCaption } from "./format";
 import { WaterScene } from "./scene";
 import type { Catalog, Figure, MenuId } from "./types";
 
@@ -28,7 +28,10 @@ const dialog = required<HTMLDialogElement>("#sources");
 const tabModel = required<HTMLButtonElement>("#tab-model");
 const tabCampus = required<HTMLButtonElement>("#tab-datacenter");
 
-const scene = new WaterScene(sceneRoot);
+const scene = new WaterScene(sceneRoot, {
+  dropMl,
+  modelCapacity: data.meta.modelCupMl,
+});
 let menu: MenuId = "model";
 let selectedId = "gpt-4o-short";
 
@@ -49,7 +52,7 @@ function selectedFigure(): Figure {
 }
 
 function renderLegend(): void {
-  legend.textContent = legendFor(menu, dropMl);
+  legend.textContent = legendFor(menu, dropMl, data.meta.modelCupMl, data.meta.campusCupGalPerDay);
 }
 
 function renderPlaque(figure: Figure): void {
@@ -57,14 +60,19 @@ function renderPlaque(figure: Figure): void {
   const parts = figure.onsiteMl != null && figure.offsiteMl != null
     ? `${figure.onsiteMl.toFixed(2)} mL on-site + ${figure.offsiteMl.toFixed(2)} mL off-site`
     : null;
+  const cap = capacity(menu);
+  const scale = scaleCaption(menu, figure.value, cap, dropMl, data.meta.modelCupMl, data.meta.campusCupGalPerDay);
   const campusLink = figure.id === "grok-per-query-gap"
     ? `<button type="button" class="text-btn" id="show-campus">Show Colossus &amp; Colossus 2</button>`
     : "";
+  plaque.classList.toggle("is-overflow", scale.title != null);
   plaque.innerHTML = `
     <p class="badge badge-${figure.evidence}">${evidenceLabel(figure.evidence)}</p>
     <h2>${figure.name}</h2>
     <p class="sub">${figure.subtitle}</p>
     <p class="value">${formatAmount(figure.value, figure.unit)}</p>
+    ${scale.title ? `<p class="exceeds">${scale.title}</p>` : ""}
+    <p class="scale-line">${scale.text}</p>
     ${range ? `<p class="range">Reported range ${range}</p>` : `<p class="range">No published uncertainty band</p>`}
     ${parts ? `<p class="split">${parts}</p>` : ""}
     <p class="boundary">${figure.boundary}</p>
@@ -180,12 +188,15 @@ function choose(nextMenu: MenuId, id: string): void {
   renderPicker();
   const figure = selectedFigure();
   renderPlaque(figure);
-  const fraction = fillFraction(figure.value, capacity(menu));
+  const cap = capacity(menu);
+  const fraction = fillFraction(figure.value, cap);
   const units = menu === "model" ? dropUnits(figure.value, dropMl) : null;
-  const overflow = figure.value != null && figure.value > capacity(menu);
+  const overflow = figure.value != null && figure.value > cap;
   scene.request({
     menu,
     fraction,
+    capacity: cap,
+    value: figure.value,
     dropUnits: units,
     overflow,
   });
