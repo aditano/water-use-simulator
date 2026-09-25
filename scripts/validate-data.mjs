@@ -66,8 +66,52 @@ if (!drop || Math.abs(drop.value - waterMl(0.421, ...azure)) > 0.02) {
   throw new Error("Drop reference drifted from the GPT-4o derivation");
 }
 
-if (data.meta.modelCupMl !== 20 || data.meta.campusCupGalPerDay !== 4000000) {
+if (data.meta.modelCupMl !== 40 || data.meta.campusCupGalPerDay !== 4000000) {
   throw new Error("Cup capacities changed without a legend update");
+}
+if (!String(data.meta.dropDefinition).includes("40 mL")) {
+  throw new Error("Drop definition must describe the 40 mL model etching");
+}
+
+const byId = (id) => data.figures.find((item) => item.id === id);
+const cup = data.meta.modelCupMl;
+const mustFit = [
+  "llama-33-70b-short",
+  "gpt-4o-short",
+  "claude-37-sonnet-short",
+  "gpt-4-short",
+  "llama-31-405b-short",
+  "claude-37-sonnet-et-short",
+  "o3-short",
+  "gpt3-li-us-average",
+];
+for (const id of mustFit) {
+  const figure = byId(id);
+  if (!figure || !(figure.value < cup)) {
+    throw new Error(`${id} should sit inside the ${cup} mL glass`);
+  }
+}
+for (const id of ["mistral-large-2-400", "deepseek-r1-short", "gpt4-email-wapo"]) {
+  const figure = byId(id);
+  if (!figure || !(figure.value > cup)) {
+    throw new Error(`${id} should exceed the ${cup} mL glass`);
+  }
+}
+const gpt4o = byId("gpt-4o-short");
+const gpt4 = byId("gpt-4-short");
+const o3 = byId("o3-short");
+const claude = byId("claude-37-sonnet-short");
+if (!gpt4o || !(gpt4o.value / cup < 0.08)) {
+  throw new Error("GPT-4o should remain a small fraction of the model glass");
+}
+if (!claude || !(claude.value > gpt4o.value * 1.5 && claude.value / cup < 0.12)) {
+  throw new Error("Claude short prompt should read as a thin fill above one drop");
+}
+if (!gpt4 || !(gpt4.value / cup > 0.1 && gpt4.value / cup < 0.3)) {
+  throw new Error("GPT-4 short prompt should be a low partial fill");
+}
+if (!o3 || !(o3.value / cup < 0.7 && o3.value / cup > 0.45)) {
+  throw new Error("o3 should read as a partial fill of the model glass");
 }
 
 const council = data.figures.find((item) => item.id === "google-council-bluffs");

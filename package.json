@@ -9,7 +9,11 @@
     "test": "tsc --noEmit && node scripts/validate-data.mjs"
   },
   "devDependencies": {
+    "@types/three": "^0.186.0",
     "typescript": "^5.7.3",
     "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "three": "^0.186.1"
   }
 }

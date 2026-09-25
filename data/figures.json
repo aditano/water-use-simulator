@@ -1,10 +1,10 @@
 {
   "meta": {
     "researched": "2026-09-24",
-    "modelCupMl": 20,
+    "modelCupMl": 40,
     "campusCupGalPerDay": 4000000,
     "dropReferenceId": "gpt-4o-short",
-    "dropDefinition": "In the model menu, one drop equals the derived operational water of one short GPT-4o query (100 input tokens, 300 output tokens): Jegham et al. 2025 Table 4 mean energy passed through their equation (3). The glass is etched at 20 mL. Campus mode uses a different etching: a full glass is 4 million gallons per day."
+    "dropDefinition": "In the model menu, one drop equals the derived operational water of one short GPT-4o query (100 input tokens, 300 output tokens): Jegham et al. 2025 Table 4 mean energy passed through their equation (3). The model glass is etched at 40 mL. It is a tapered tumbler, so a short prompt fills only the bottom and a figure past 40 mL spills. Campus mode uses a different etching: a full glass is 4 million gallons per day."
   },
   "figures": [
     {
@@ -158,7 +158,7 @@
       "sourceUrl": "https://arxiv.org/abs/2505.09598",
       "published": "2025-05",
       "dataYear": "2025",
-      "notes": "Table 4 mean energy 7.026 ± 3.663 Wh. Azure multipliers PUE 1.12, on-site WUE 0.30 L/kWh, off-site WUE 3.142 L/kWh. The mean sits above the 20 mL glass, so the faucet fills the glass and a little spills. Most of the water is off-site electricity, not the cooling tower.",
+      "notes": "Table 4 mean energy 7.026 ± 3.663 Wh. Azure multipliers PUE 1.12, on-site WUE 0.30 L/kWh, off-site WUE 3.142 L/kWh. The mean is 24.0 mL, inside the 40 mL etching, so the glass fills past halfway and does not spill. Most of the water is off-site electricity, not the cooling tower.",
       "assumptions": "Linear propagation of the energy standard deviation. The paper's o3 energy spread is large, so this range is wide on purpose."
     },
     {
@@ -180,7 +180,7 @@
       "sourceUrl": "https://arxiv.org/abs/2505.09598",
       "published": "2025-05",
       "dataYear": "2025",
-      "notes": "Table 4 mean energy 23.815 ± 2.160 Wh. Multipliers from Table 1: PUE 1.27, on-site WUE 1.20 L/kWh, off-site WUE 6.016 L/kWh. The paper states DeepSeek-R1 consumes more than 150 mL per query; this derivation is 166 mL at the short-prompt mean, inside that description. The glass holds 20 mL and the rest runs to the drain. The authors attribute the size of this footprint to deployment infrastructure, not only to model architecture.",
+      "notes": "Table 4 mean energy 23.815 ± 2.160 Wh. Multipliers from Table 1: PUE 1.27, on-site WUE 1.20 L/kWh, off-site WUE 6.016 L/kWh. The paper states DeepSeek-R1 consumes more than 150 mL per query; this derivation is 166 mL at the short-prompt mean, inside that description. The glass is etched at 40 mL, so this 166 mL figure fills the tumbler and the rest spills. The plaque marks that overflow as Exceeds glass. The authors attribute the size of this footprint to deployment infrastructure, not only to model architecture.",
       "assumptions": "Off-site WUE is the paper's China grid factor, so this row is not comparable to a U.S. Azure deployment of the same model."
     },
     {
@@ -262,7 +262,7 @@
       "sourceUrl": "https://mistral.ai/news/our-contribution-to-a-global-environmental-standard-for-ai",
       "published": "2025-07",
       "dataYear": "2025",
-      "notes": "Mistral, with Carbone 4 and ADEME, and a critical review by Resilio and Hubblo, reports 45 mL of water, 1.14 gCO2e, and 0.16 mg Sb eq for that response. Training through January 2025 is reported separately as 281,000 m³ of water and 20.4 ktCO2e and is not what the glass pours. The ADEME library record is dated July 2025 (posted 21 August 2025). No uncertainty band is published for the 45 mL figure.",
+      "notes": "Mistral, with Carbone 4 and ADEME, and a critical review by Resilio and Hubblo, reports 45 mL of water, 1.14 gCO2e, and 0.16 mg Sb eq for that response. Training through January 2025 is reported separately as 281,000 m³ of water and 20.4 ktCO2e and is not what the glass pours. The ADEME library record is dated July 2025 (posted 21 August 2025). No uncertainty band is published for the 45 mL figure. The model glass is etched at 40 mL, so 45 mL fills the tumbler and spills.",
       "assumptions": "A 400-token answer is a longer task than the 100/300-token short prompt used for the Jegham rows."
     },
     {
@@ -282,7 +282,7 @@
       "sourceUrl": "https://www.washingtonpost.com/technology/2024/09/18/energy-ai-use-electricity-water-data-centers/",
       "published": "2024-09-18",
       "dataYear": "2024",
-      "notes": "The Post's 18 September 2024 story, reported with UC Riverside, says a GPT-4 100-word email uses 519 mL at an average American data center — the graphic's 'once' figure, consistent with their 'once weekly for a year ≈ 27 liters' (52 × 519 mL ≈ 27.0 L). The headline frames it as about a bottle of water per email. The live article page available during this research was truncated before the graphic; 519 mL is taken from the article text as captured from https://archive.ph/QD678 and checked against that weekly total. It is an estimate for a specific email task, not a measured OpenAI meter, and it is not comparable to Altman's 0.32 mL claim or Google's 0.26 mL Gemini figure without reading the boundary.",
+      "notes": "The Post's 18 September 2024 story, reported with UC Riverside, says a GPT-4 100-word email uses 519 mL at an average American data center — the graphic's 'once' figure, consistent with their 'once weekly for a year ≈ 27 liters' (52 × 519 mL ≈ 27.0 L). The headline frames it as about a bottle of water per email. The live article page available during this research was truncated before the graphic; 519 mL is taken from the article text as captured from https://archive.ph/QD678 and checked against that weekly total. It is an estimate for a specific email task, not a measured OpenAI meter, and it is not comparable to Altman's 0.32 mL claim or Google's 0.26 mL Gemini figure without reading the boundary. The model glass is etched at 40 mL, so this 519 mL estimate is an intentional overflow, not a short-prompt fill.",
       "assumptions": "No uncertainty range was printed beside 519 mL in the sources used here, so the glass uses the reported point value and does not invent a band."
     },
     {
