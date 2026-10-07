@@ -103,3 +103,11 @@ Colossus 2 (Tulane Road) does not have its own published daily meter in these so
 - Comparing a 0.26 mL Gemini prompt with a 519 mL GPT-4 email, or a Google consumption figure with a Meta withdrawal, will mislead if you ignore the badge. The simulator keeps them on one glass so the scale difference is visible, and the plaque says they are different measurements.
 
 Machine-readable copies, including notes and source URLs, live in [`data/figures.json`](data/figures.json). The in-app Sources sheet reads that file.
+
+## License
+
+Copyright 2026 Anthony DiTano.
+
+Water Glass is released under the GNU General Public License, version 3 or any later version (`GPL-3.0-or-later`). The full official text is in [LICENSE](LICENSE), copied from <https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+Third-party assets and data keep their own licenses. npm dependencies remain under the licenses recorded for those packages. Publications cited in [`data/figures.json`](data/figures.json) remain with their original authors and publishers.
