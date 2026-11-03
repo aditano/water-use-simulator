@@ -21,25 +21,25 @@
         <h1>Water Glass</h1>
       </header>
       <div class="tabs glass-panel" role="tablist" aria-label="What to pour">
-        <button type="button" id="tab-datacenter" role="tab" aria-selected="false">Data Centers</button>
-        <button type="button" id="tab-model" role="tab" aria-selected="true">AI Models</button>
+        <button type="button" id="tab-datacenter" role="tab" aria-selected="false" aria-controls="picker">Data Centers</button>
+        <button type="button" id="tab-model" role="tab" aria-selected="true" aria-controls="picker">AI Models</button>
       </div>
       <aside class="glass-panel side" aria-label="Choose a figure">
         <div class="side-bar">
-          <p>Figures</p>
+          <p id="figures-label">Figures</p>
           <button type="button" class="text-btn" id="open-sources">Sources</button>
         </div>
-        <div id="picker" class="picker" role="listbox"></div>
+        <div id="picker" class="picker" role="listbox" aria-labelledby="figures-label" tabindex="0"></div>
       </aside>
       <section class="glass-panel readouts" aria-label="Selected figure">
-        <div id="plaque" aria-live="polite"></div>
+        <div id="plaque" class="plaque" aria-live="polite"></div>
         <p id="legend" class="legend"></p>
       </section>
     </div>
-    <dialog id="sources">
+    <dialog id="sources" aria-labelledby="sources-title">
       <div class="sheet">
         <header class="sheet-bar">
-          <h2>Sources</h2>
+          <h2 id="sources-title">Sources</h2>
           <button type="button" class="text-btn" id="close-sources">Done</button>
         </header>
         <div id="sources-body" class="sheet-body"></div>

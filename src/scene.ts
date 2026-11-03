@@ -789,37 +789,48 @@ export class WaterScene {
       return;
     }
     const height = heightForVolumeFraction(this.level);
-    if (height < 0.0012) {
+    // Sub-drop fills (Gemini ≈ 0.00112) must still draw a shallow bead — true
+    // height alone is thinner than the glass floor can show.
+    if (this.level <= 0 || height <= 0) {
       this.water.visible = false;
       this.meniscus.visible = false;
+      this.waterGeoHeight = -1;
       this.setCaustic(0);
       return;
     }
+    // Floor the drawn height so sub-drop beads clear the glass floor; keep under
+    // the 1-drop etch (~0.006) so Gemini stays a shallow pool, not a GPT-4o drop.
+    const renderHeight = Math.max(height, 0.0044);
     const surfaceY = Math.min(
-      TUMBLER.innerBottomY + height,
+      TUMBLER.innerBottomY + renderHeight,
       TUMBLER.innerBottomY + TUMBLER.innerHeight - 0.0015,
     );
     this.water.visible = true;
     this.meniscus.visible = true;
-    if (Math.abs(height - this.waterGeoHeight) > 0.00025) {
+    if (Math.abs(renderHeight - this.waterGeoHeight) > 0.00025) {
       this.rebuildWater(surfaceY);
-      this.waterGeoHeight = height;
+      this.waterGeoHeight = renderHeight;
     }
-    const radius = Math.max(0.006, radiusAtHeight(surfaceY) - 0.0022);
+    const radius = Math.max(0.012, radiusAtHeight(surfaceY) - 0.0016);
     this.splash = Math.max(0, this.splash - 0.016 * 2.4);
     const idleWave = this.phase.name === "idle" ? Math.sin(time * 0.0022) * 0.012 : 0;
     const pulse = 1 + this.splash * 0.07 + idleWave;
     this.meniscus.position.y = surfaceY + 0.0005;
     this.meniscus.scale.set(radius * pulse, radius * pulse, 1);
-    this.setCaustic(this.level);
+    const meniscusMat = this.meniscus.material;
+    if (meniscusMat instanceof THREE.MeshStandardMaterial) {
+      meniscusMat.opacity = this.level < 0.02 ? 1 : 0.92;
+      meniscusMat.emissive.setHex(this.level < 0.02 ? 0x123a66 : 0x000000);
+    }
+    this.setCaustic(Math.max(this.level, 0.05));
   }
 
   private rebuildWater(surfaceY: number): void {
     if (!this.water) {
       return;
     }
-    const y0 = TUMBLER.innerBottomY + 0.0012;
-    const top = Math.max(y0 + 0.0016, surfaceY);
+    const y0 = TUMBLER.innerBottomY + 0.0008;
+    const top = Math.max(y0 + 0.0018, surfaceY);
     const steps = 8;
     const points = [new THREE.Vector2(0.001, y0)];
     for (let i = 0; i <= steps; i += 1) {
